@@ -23,7 +23,7 @@ wget_installed=$(type -P wget &>/dev/null)
 
 # arg should not have '.vim', it will be added later
 PLUGIN_NAME=$1
-TEMP_FILE=$(mktemp)
+TEMP_FILE=$(mktemp temp)
 
 # define dirs
 VIM_PLUGIN_DIR="$HOME/.vim/plugin/"
@@ -40,9 +40,9 @@ URL="http://www.google.com/cse?cx=partner-pub-3005259998294962:bvyni59kjr1&ie=IS
 # fetch the HTML for the google search result
 echo "Looking for plugin."
 if $wget_installed ; then
-    wget --quiet -O $TEMP_FILE "$URL" -U "$USER_AGENT"
+    wget --quiet -O $TEMP_FILE -U "$USER_AGENT" "$URL"
 else
-    curl -S -o $TEMP_FILE "$URL" -U "$USER_AGENT"
+    curl -S -o $TEMP_FILE -U "$USER_AGENT" "$URL"
 fi
 
 
