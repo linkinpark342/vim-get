@@ -9,7 +9,7 @@
 #   5. unpack according to file type
 
 # See if user provided an argument
-if [ $# -le 1 ]
+if [ $# -lt 1 ]
 then
     echo "Usage: 'vim-plugin-install \$PLUGIN_NAME'"
     exit
@@ -60,7 +60,7 @@ install_plugin() {
     if [ -z "$FIRST_RESULT" ]
     then
         echo "No results found."
-        exit
+        return
     fi
 
     echo "Found candidate."
