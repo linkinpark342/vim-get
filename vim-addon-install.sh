@@ -23,7 +23,7 @@ wget_installed=$(type -P wget &>/dev/null)
 
 # arg should not have '.vim', it will be added later
 PLUGIN_NAME=$1
-TEMP_FILE=$(mktemp temp)
+TEMP_FILE=$(mktemp)
 
 # define dirs
 VIM_PLUGIN_DIR="$HOME/.vim/plugin/"
@@ -119,7 +119,7 @@ case $FILE_NAME in
         tar xvzf "$CURRENT_DIR/$FILE_NAME"
         cd "$CURRENT_DIR"
         ;;
-    *.vba )
+    *.vba* )
         echo "Unpacking and adding to plugin directory."
         vim -c "source %" -c "q" "$FILE_NAME"
         ;;
