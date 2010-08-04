@@ -37,16 +37,16 @@ install_plugin() {
     # sorry to lie about the user agent, i really don't wana but google just rejects wget
     USER_AGENT="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7) Gecko/20040613 Firefox/0.8.0+"
 
-    # create the url with the first argument as the query (add .vim)
-    URL="http://www.google.com/cse?cx=partner-pub-3005259998294962:bvyni59kjr1&ie=ISO-8859-1&sa=Search&siteurl=www.vim.org/scripts/index.php&q=$PLUGIN_NAME.vim"
+    # create the url with the first argument as the query
+    URL="http://www.google.com/cse?cx=partner-pub-3005259998294962:bvyni59kjr1&ie=ISO-8859-1&sa=Search&siteurl=www.vim.org/scripts/index.php&q=$PLUGIN_NAME"
     #URL="http://www.google.com/cse?sa=Search&siteurl=www.vim.org/scripts/index.php&q=$1"
 
     # fetch the HTML for the google search result
     echo "Looking for plugin: $PLUGIN_NAME"
     if $wget_installed ; then
-        wget --quiet -O $TEMP_FILE -U "$USER_AGENT" "$URL"
+        wget --quiet -U "$USER_AGENT" -O $TEMP_FILE "$URL"
     else
-        curl -S -o $TEMP_FILE -U "$USER_AGENT" "$URL"
+        curl -S -U "$USER_AGENT" -o $TEMP_FILE "$URL"
     fi
 
 
@@ -68,14 +68,15 @@ install_plugin() {
     # go to script page of first result
     echo "Fetching plugin page."
     if $wget_installed ; then
-        wget --quiet -O $TEMP_FILE "$FIRST_RESULT" -U "$USER_AGENT"
+        wget --quiet -U "$USER_AGENT" -O $TEMP_FILE "$FIRST_RESULT"
     else
-        curl -S -o $TEMP_FILE "$FIRST_RESULT" -U "$USER_AGENT"
+        curl -S -U "$USER_AGENT" -o $TEMP_FILE "$FIRST_RESULT"
     fi
 
     # find the first download link (most recent version of plugin)
     echo "Grabbing download link."
     DOWNLOAD_URL="http://www.vim.org/scripts/$(grep -o "download_script\.php?src_id=[0-9]\+" $TEMP_FILE | head -1)"
+
     # grab file name from 'a href'
     FILE_NAME=$(grep -o "download_script\.php?src_id=[0-9]\+[^<]*" $TEMP_FILE | awk -F'>' '{print $2}' | head -1)
     # grab the script type from the html
@@ -87,14 +88,14 @@ install_plugin() {
     # download
     echo "Downloading file: $FILE_NAME"
     if $wget_installed ; then
-        wget --quiet -O $FILE_NAME "$DOWNLOAD_URL" -U "$USER_AGENT"
+        wget --quiet -U "$USER_AGENT" -O $FILE_NAME "$DOWNLOAD_URL"
     else
-        curl -S -o $FILE_NAME "$DOWNLOAD_URL" -U "$USER_AGENT"
+        curl -S -U "$USER_AGENT" -o $FILE_NAME "$DOWNLOAD_URL"
     fi
 
     echo $FILE_NAME
-    # check to see if we have a *vim file. this case is easy
 
+    # do different actions based on file type
     case $FILE_NAME in
         *.vim )
             # check to see if the script type we got earlier 
@@ -126,6 +127,9 @@ install_plugin() {
         *.vba* )
             echo "Unpacking and adding to plugin directory."
             vim -c "source %" -c "q" "$FILE_NAME"
+            # If there is a vba.gz, vim removes the gz, so change the file
+            # name accordingly so it can be deleted
+            FILE_NAME=$(echo "$FILE_NAME" | sed 's/vba\.gz$/vba/g')
             ;;
         *.zip )
             echo "Unpacking and adding to plugin directory."
@@ -137,15 +141,13 @@ install_plugin() {
     esac
 
     rm "$FILE_NAME"
-
-    echo "Finished installing addon."
 }
+
 
 # for each plugin name, install it
 for var in "$@"
 do
     install_plugin $var
 done
-
 
 echo -e "\nFinished, exiting."
