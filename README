@@ -14,8 +14,8 @@ installed to the colors folder.
 This script is still experimental, so use with discretion.
 
 I recommend adding an alias to your .bashrc such as:
-    alias vim-addon-install='bash $HOME/Documents/Programming/vim-addon-install/vim-addon-install.sh'
-    alias vai='bash $HOME/Documents/Programming/vim-addon-install/vim-addon-install.sh'
+    alias vim-addon-install='bash $SOME_PATH/vim-addon-install/vim-addon-install.sh'
+    alias vai='bash $SOME_PATH/vim-addon-install/vim-addon-install.sh'
 Personally, I like 'vai', even though it isn't very clear what the
 command is doing.
 
