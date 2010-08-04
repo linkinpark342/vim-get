@@ -120,7 +120,7 @@ case $FILE_NAME in
 #        tar xvjf "$CURRENT_DIR/$FILE_NAME"
 #        cd "$CURRENT_DIR"
 #        ;;
-    *.vba )
+    *.vba* )
         echo "Unpacking and adding to plugin directory."
         vim -c "source %" -c "q" "$FILE_NAME"
         ;;
