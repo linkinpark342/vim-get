@@ -151,6 +151,48 @@ install_addon() {
     rm "$FILE_NAME"
 }
 
+# a function to remove an addon
+remove_addon() {
+    echo -e "\nBeginning removal of addon."
+
+    # arg should not have '.vim' etc, it will be added later
+    ADDON_NAME=$1
+
+    # download the addon
+    FILE_NAME=""
+    download_addon $ADDON_NAME
+
+    # file name is empty, so no file found; exit loop
+    if [ -z "$FILE_NAME" ]; then
+        return
+    fi
+
+    # do different actions based on file type
+    case $FILE_NAME in
+        *.vim )
+            # check to see if the script type we got earlier 
+            # was  a color file. if so, remove it from the
+            # color directory
+            if [[ $SCRIPT_TYPE == *color* ]]
+            then
+                echo "Deleting addon from colors directory."
+                # combine dir and file name, removing double slashes
+                FILE_PATH=$(echo "$VIM_COLORS_DIR/$FILE_NAME" | sed "s#//#/#g")
+                rm $FILE_PATH
+            else
+                echo "Deleting addon from plugin directory."
+                # combine dir and file name, removing double slashes
+                FILE_PATH=$(echo "$VIM_PLUGIN_DIR/$FILE_NAME" | sed "s#//#/#g")
+                rm $FILE_PATH
+            fi
+            ;;
+        * )
+            echo "Deleting that filetype is not supported yet."
+            ;;
+    esac
+
+    rm "$FILE_NAME"
+}
 
 # This is the main logic. The first argument is the command, which can either
 # be 'install' or 'remove'. The arguments are stored by bash in the variable
@@ -168,9 +210,15 @@ case $1 in
             install_addon $var
         done
         ;;
-
     remove )
-        echo "Remove not implemented yet."
+        # shift args over
+        shift
+
+        # for each addon name, install it
+        for var in "$@"
+        do
+            remove_addon $var
+        done
         ;;
     * )
         echo "Unrecognized command."
