@@ -1,6 +1,24 @@
+Summary
+---------------
 A small script to handle installing and deleting vim addons.
 
-Example uses:
-    vim-get install molokai
-    vim-get remove zenburn
-    vim-get install NERD_commenter
+Example uses
+---------------
+    $ vim-get install molokai
+    $ vim-get remove zenburn
+    $ vim-get install NERD_commenter
+
+Install
+----------
+    $ cd $HOME
+    $ mkdir Scripts
+    $ cd Scripts
+    $ git clone git://github.com/mellort/vim-get.git
+    $ echo "alias vim-get=\"bash $HOME/Scripts/vim-get/vim-get.sh\"" >> $HOME/.bashrc
+
+Advanced Configuration
+-----------------------
+Near the top of the file, there are some directory definitions; these
+can be changed to suit your configuration.
+
+
