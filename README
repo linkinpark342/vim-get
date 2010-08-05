@@ -1,4 +1,4 @@
-A small script to handle installing and deleting (TODO) vim addons.
+A small script to handle installing and deleting vim addons.
 
 Example uses:
     vim-get install molokai
