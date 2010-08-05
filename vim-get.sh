@@ -1,17 +1,10 @@
 #!/bin/bash
 # This is a script to fetch and install vim addons
-#
-# Here's how the script works:
-#   1. search for the plugin using the vim/google search
-#   2. scrape the results and get the first script link
-#   3. get the most recent dl link from the script page
-#   4. download the file
-#   5. unpack according to file type
 
-# See if user provided an argument
+# See if user provided sufficient arguments (>1)
 if [ $# -lt 1 ]
 then
-    echo "Usage: 'vim-plugin-install \$PLUGIN_NAME'"
+    echo "Usage: 'vim-get (install|remove) [addon names]'"
     exit
 fi
 
@@ -26,23 +19,23 @@ VIM_PLUGIN_DIR="$HOME/.vim/plugin/"
 VIM_COLORS_DIR="$HOME/.vim/colors/"
 VIM_DIR="$HOME/.vim"
 
-# a function to install the plugin
-install_plugin() {
-    echo -e "\nBeginning installation of addon."
-
+# Function for downloading an addon given the name
+download_addon() {
     # arg should not have '.vim', it will be added later
-    PLUGIN_NAME=$1
+    ADDON_NAME=$1
+
+    # make a temp file for use storing
     TEMP_FILE=$(mktemp)
 
     # sorry to lie about the user agent, i really don't wana but google just rejects wget
     USER_AGENT="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7) Gecko/20040613 Firefox/0.8.0+"
 
     # create the url with the first argument as the query
-    URL="http://www.google.com/cse?cx=partner-pub-3005259998294962:bvyni59kjr1&ie=ISO-8859-1&sa=Search&siteurl=www.vim.org/scripts/index.php&q=$PLUGIN_NAME"
+    URL="http://www.google.com/cse?cx=partner-pub-3005259998294962:bvyni59kjr1&ie=ISO-8859-1&sa=Search&siteurl=www.vim.org/scripts/index.php&q=$ADDON_NAME"
     #URL="http://www.google.com/cse?sa=Search&siteurl=www.vim.org/scripts/index.php&q=$1"
 
     # fetch the HTML for the google search result
-    echo "Looking for plugin: $PLUGIN_NAME"
+    echo "Looking for plugin: $ADDON_NAME"
     if $wget_installed ; then
         wget --quiet -U "$USER_AGENT" -O $TEMP_FILE "$URL"
     else
@@ -92,8 +85,23 @@ install_plugin() {
     else
         curl -S -U "$USER_AGENT" -o $FILE_NAME "$DOWNLOAD_URL"
     fi
+}
 
-    echo $FILE_NAME
+# a function to install the addon
+install_addon() {
+    echo -e "\nBeginning installation of addon."
+
+    # arg should not have '.vim', it will be added later
+    ADDON_NAME=$1
+
+    # download the addon
+    FILE_NAME=""
+    download_addon $ADDON_NAME
+
+    # file name is empty, so no file found; exit loop
+    if [ -z "$FILE_NAME" ]; then
+        return
+    fi
 
     # do different actions based on file type
     case $FILE_NAME in
@@ -144,10 +152,29 @@ install_plugin() {
 }
 
 
-# for each plugin name, install it
-for var in "$@"
-do
-    install_plugin $var
-done
+# This is the main logic. The first argument is the command, which can either
+# be 'install' or 'remove'. The arguments are stored by bash in the variable
+# $@. We use the command 'shift' to shift all of the arguments back an index,
+# thus 'discarding' the first argument. The rest of the args are presumably
+# addon names, which will be looped through.
+case $1 in
+    install )
+        # shift args over
+        shift
+
+        # for each addon name, install it
+        for var in "$@"
+        do
+            install_addon $var
+        done
+        ;;
+
+    remove )
+        echo "Remove not implemented yet."
+        ;;
+    * )
+        echo "Unrecognized command."
+        ;;
+esac
 
 echo -e "\nFinished, exiting."
