@@ -106,7 +106,7 @@ download_addon() {
 	DESCRIPTION=$(grep -A1 ">description<" $TEMP_FILE | tail -1 |sed -e :a -e 's/<[^>]*>//g;/</N;//ba' | awk -F. 'BEGIN {OFS=""} {print $1,".", $2, "."}')
 
     # not the smartest way to do this
-    SHORT_FILE_NAME=$(echo $FILE_NAME | sed 's/\(\.zip\|\.vba\|\.tar\|\.vba\.gz\|\.tar\.gz\)//g')
+    SHORT_FILE_NAME=$(echo $FILE_NAME | sed 's/\(\.zip\|\.vba\|\.tar\|\.vba\.gz\|\.tar\.gz\|\.vim\)//g')
 
 
 	# Create new file containing script info, modify
@@ -158,7 +158,7 @@ install_addon() {
 		# just want to make sure we modify the listing files
 		case $FILE_NAME in
 			*.vim )
-                echo "Copying color scheme to colors directory."
+				echo "Copying color scheme to colors directory."
 				cp $FILE_NAME $VIM_COLORS_DIR
 				;;
 			*.tar* )
@@ -172,8 +172,9 @@ install_addon() {
 		mkdir $VIM_PLUGIN_DIR/$SHORT_FILE_NAME
 		case $FILE_NAME in
 			*.vim )
-                echo "Copying file to plugin directory."
-                cp $FILE_NAME $VIM_PLUGIN_DIR/$SHORT_FILE_NAME
+				mkdir $VIM_PLUGIN_DIR/$SHORT_FILE_NAME/plugin
+				echo "Copying file to plugin directory."
+				cp $FILE_NAME $VIM_PLUGIN_DIR/$SHORT_FILE_NAME/plugin
 				;;
 			*.tar* )
 		 		echo "Unpacking and adding to plugin directory."
@@ -215,8 +216,10 @@ remove_addon() {
 	if [[ "$ADDON_TYPE" == "color" ]]
 	then
 		rm $VIM_COLORS_DIR/$ADDON_NAME.vim
+		rm $VIM_COLOR_LISTING_DIR/$ADDON_NAME
 	else
 		rm -rf $VIM_PLUGIN_DIR/$ADDON_NAME
+		rm $VIM_PLUGIN_LISTING_DIR/$ADDON_NAME
 		sed -i '/$ADDON_NAME\$/d' $VIM_PLUGIN_LISTING_FILE
 	fi
 
