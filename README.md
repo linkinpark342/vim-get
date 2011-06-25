@@ -10,6 +10,7 @@ Example uses
 
 Install
 ----------
+    $ chmod +x install.sh
     $ ./install.sh
 
 Advanced Configuration
