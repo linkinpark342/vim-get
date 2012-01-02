@@ -1,3 +1,9 @@
+NOTE
+---------------
+
+This project used to be kinda cool, but not tools like pathogen
+and vundle exist. Use those.
+
 Summary
 ---------------
 A small script to handle installing and deleting vim addons.
